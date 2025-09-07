@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Portfolio | Creative Designer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-cyan: #00ffff;
+            --primary-magenta: #ff00ff;
+            --primary-yellow: #ffff00;
+            --bg-dark: #0c0c0c;
+            --bg-secondary: #1a1a2e;
+            --bg-tertiary: #16213e;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --text-muted: #888888;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --shadow-glow: rgba(0, 255, 255, 0.3);
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-secondary) 50%, var(--bg-tertiary) 100%);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        /* Custom cursor - only for desktop */
+        @media (min-width: 1024px) {
+            body {
+                cursor: none;
+            }
+
+            .cursor {
+                position: fixed;
+                width: 20px;
+                height: 20px;
+                background: radial-gradient(circle, var(--primary-cyan) 0%, transparent 70%);
+                border: 2px solid var(--primary-cyan);
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: 10000;
+                transform: translate(-50%, -50%);
+                transition: all 0.1s ease;
+                mix-blend-mode: difference;
+            }
+
+            .cursor.grow {
+                transform: translate(-50%, -50%) scale(2);
+                background: radial-gradient(circle, var(--primary-magenta) 0%, transparent 70%);
+                border-color: var(--primary-magenta);
+            }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1rem 1.5rem;
+            z-index: 1000;
+            backdrop-filter: blur(15px);
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid var(--glass-border);
+            animation: slideDown 1s ease-out;
+            transition: var(--transition-smooth);
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            font-weight: 800;
+            background: linear-gradient(45deg, var(--primary-cyan), var(--primary-magenta));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glow 2s ease-in-out infinite alternate;
+            letter-spacing: -0.02em;
+        }
+
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 10px var(--primary-cyan)); }
+            to { filter: drop-shadow(0 0 20px var(--primary-magenta)); }
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: clamp(1rem, 3vw, 2.5rem);
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            transition: var(--transition-smooth);
+            padding: 0.75rem 0;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary-cyan), var(--primary-magenta));
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Mobile menu toggle */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 4px;
+            padding: 0.5rem;
+        }
+
+        .menu-toggle span {
+            width: 25px;
+            height: 3px;
+            background: var(--text-primary);
+            border-radius: 2px;
+            transition: var(--transition-smooth);
+        }
+
+        .menu-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(6px, 6px);
+        }
+
+        .menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            padding: 2rem 1rem;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(0, 255, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 0, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(255, 255, 0, 0.08) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(1deg); }
+            66% { transform: translate(-20px, 20px) rotate(-1deg); }
+        }
+
+        .hero-content {
+            text-align: center;
+            z-index: 2;
+            animation: fadeInUp 1.5s ease-out;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(50px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            margin-bottom: 1.5rem;
+            background: linear-gradient(45deg, var(--text-primary), var(--primary-cyan), var(--primary-magenta), var(--text-primary));
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 4s ease-in-out infinite;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero p {
+            font-size: clamp(1.1rem, 3vw, 1.5rem);
+            margin-bottom: 2.5rem;
+            color: var(--text-secondary);
+            animation: fadeInUp 1.5s ease-out 0.5s both;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: clamp(0.875rem, 2.5vw, 1.25rem) clamp(2rem, 5vw, 3rem);
+            background: linear-gradient(45deg, var(--primary-cyan), var(--primary-magenta));
+            color: var(--bg-dark);
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition-bounce);
+            animation: fadeInUp 1.5s ease-out 1s both;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .cta-button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.5s ease;
+        }
+
+        .cta-button:hover::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 20px 40px var(--shadow-glow);
+        }
+
+        /* Portfolio Section */
+        .portfolio {
+            padding: clamp(4rem, 10vw, 8rem) clamp(1rem, 5vw, 4rem);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            text-align: center;
+            margin-bottom: clamp(3rem, 8vw, 5rem);
+            background: linear-gradient(45deg, var(--primary-cyan), var(--primary-magenta));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: clamp(80px, 15vw, 120px);
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-cyan), var(--primary-magenta));
+            border-radius: 2px;
+        }
+
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 350px), 1fr));
+            gap: clamp(1.5rem, 4vw, 2.5rem);
+            margin-bottom: 4rem;
+        }
+
+        .portfolio-item {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            transition: var(--transition-bounce);
+            cursor: pointer;
+            height: fit-content;
+        }
+
+        .portfolio-item:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 30px 60px var(--shadow-glow);
+        }
+
+        .portfolio-image {
+            width: 100%;
+            height: clamp(200px, 30vw, 300px);
+            background: linear-gradient(45deg, var(--bg-secondary), var(--bg-tertiary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .portfolio-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .portfolio-item:hover .portfolio-image::before {
+            left: 100%;
+        }
+
+        .portfolio-icon {
+            font-size: clamp(3rem, 8vw, 4rem);
+            color: var(--primary-cyan);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .portfolio-content {
+            padding: clamp(1.5rem, 4vw, 2rem);
+        }
+
+        .portfolio-content h3 {
+            font-size: clamp(1.25rem, 3vw, 1.5rem);
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .portfolio-content p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        .portfolio-tech {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .tech-tag {
+            padding: 0.5rem 1rem;
+            background: rgba(0, 255, 255, 0.15);
+            border: 1px solid var(--primary-cyan);
+            border-radius: 20px;
+            font-size: clamp(0.75rem, 2vw, 0.85rem);
+            color: var(--primary-cyan);
+            font-weight: 500;
+            transition: var(--transition-smooth);
+        }
+
+        .tech-tag:hover {
+            background: rgba(0, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        /* About Section */
+        .about {
+            padding: clamp(4rem, 10vw, 8rem) clamp(1rem, 5vw, 4rem);
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(26, 26, 46, 0.8));
+            position: relative;
+        }
+
+        .about::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 70% 20%, rgba(255, 0, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 30% 80%, rgba(0, 255, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .about-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: clamp(2rem, 8vw, 5rem);
+            align-items: center;
+            z-index: 2;
+            position: relative;
+        }
+
+        .about-text h2 {
+            font-size: clamp(2rem, 6vw, 2.75rem);
+            margin-bottom: 2rem;
+            background: linear-gradient(45deg, var(--primary-cyan), var(--primary-magenta));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .about-text p {
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+
+        .skills {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+            gap: clamp(1rem, 3vw, 1.5rem);
+            margin-top: 3rem;
+        }
+
+        .skill {
+            background: var(--glass-bg);
+            padding: clamp(1.5rem, 4vw, 2rem);
+            border-radius: 15px;
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            transition: var(--transition-bounce);
+            text-align: center;
+        }
+
+        .skill:hover {
+            background: rgba(0, 255, 255, 0.1);
+            border-color: var(--primary-cyan);
+            transform: translateY(-5px) scale(1.02);
+        }
+
+        .skill h4 {
+            font-size: clamp(1.1rem, 2.5vw, 1.25rem);
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .skill p {
+            color: var(--text-secondary);
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        .about-visual {
+            position: relative;
+            height: clamp(300px, 50vw, 400px);
+            margin-top: 2rem;
+        }
+
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .shape {
+            position: absolute;
+            background: linear-gradient(45deg, var(--primary-cyan), var(--primary-magenta));
+            border-radius: 50%;
+            animation: floatAround 10s ease-in-out infinite;
+            transition: var(--transition-smooth);
+        }
+
+        .shape:nth-child(1) {
+            width: clamp(40px, 8vw, 60px);
+            height: clamp(40px, 8vw, 60px);
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .shape:nth-child(2) {
+            width: clamp(30px, 6vw, 40px);
+            height: clamp(30px, 6vw, 40px);
+            top: 60%;
+            right: 20%;
+            animation-delay: -2s;
+        }
+
+        .shape:nth-child(3) {
+            width: clamp(50px, 10vw, 80px);
+            height: clamp(50px, 10vw, 80px);
+            bottom: 20%;
+            left: 30%;
+            animation-delay: -4s;
+        }
+
+        @keyframes floatAround {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(20px, -20px) rotate(90deg); }
+            50% { transform: translate(-10px, -30px) rotate(180deg); }
+            75% { transform: translate(-20px, 10px) rotate(270deg); }
+        }
+
+        /* Contact Section */
+        .contact {
+            padding: clamp(4rem, 10vw, 8rem) clamp(1rem, 5vw, 4rem);
+            max-width: 1000px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .contact p {
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .contact-form {
+            display: grid;
+            gap: clamp(1rem, 3vw, 1.5rem);
+            margin-top: 3rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+            gap: clamp(1rem, 3vw, 1.5rem);
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: clamp(1rem, 3vw, 1.5rem);
+            background: var(--glass-bg);
+            border: 2px solid var(--glass-border);
+            border-radius: 15px;
+            color: var(--text-primary);
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            backdrop-filter: blur(15px);
+            transition: var(--transition-smooth);
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-cyan);
+            box-shadow: 0 0 20px var(--shadow-glow);
+            background: rgba(0, 255, 255, 0.05);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        .submit-btn {
+            padding: clamp(1rem, 3vw, 1.5rem) clamp(2rem, 5vw, 3rem);
+            background: linear-gradient(45deg, var(--primary-cyan), var(--primary-magenta));
+            color: var(--bg-dark);
+            border: none;
+            border-radius: 50px;
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition-bounce);
+            margin-top: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: inherit;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 20px 40px var(--shadow-glow);
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(0, 0, 0, 0.8);
+            padding: clamp(2rem, 5vw, 3rem);
+            text-align: center;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: clamp(1rem, 4vw, 2rem);
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .social-links a {
+            width: clamp(50px, 8vw, 60px);
+            height: clamp(50px, 8vw, 60px);
+            background: linear-gradient(45deg, var(--primary-cyan), var(--primary-magenta));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--bg-dark);
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            text-decoration: none;
+            transition: var(--transition-bounce);
+        }
+
+        .social-links a:hover {
+            transform: translateY(-5px) rotate(360deg) scale(1.1);
+            box-shadow: 0 15px 30px var(--shadow-glow);
+        }
+
+        footer p {
+            color: var(--text-secondary);
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        /* Loading animation */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .spinner {
+            width: clamp(50px, 8vw, 70px);
+            height: clamp(50px, 8vw, 70px);
+            border: 3px solid rgba(0, 255, 255, 0.3);
+            border-top: 3px solid var(--primary-cyan);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--text-secondary);
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        /* Responsive Breakpoints */
+        @media (min-width: 768px) {
+            .about-container {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .portfolio-grid {
+                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: flex;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                height: calc(100vh - 80px);
+                background: rgba(0, 0, 0, 0.95);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: center;
+                padding-top: 3rem;
+                gap: 2rem;
+                transition: var(--transition-smooth);
+                transform: translateY(-100%);
+                opacity: 0;
+                visibility: hidden;
+            }
+
+            .nav-links.active {
+                transform: translateY(0);
+                opacity: 1;
+                visibility: visible;
+            }
+
+            .nav-links a {
+                font-size: 1.25rem;
+                padding: 1rem 0;
+            }
+
+            .hero {
+                padding-top: 6rem;
+                min-height: calc(100vh - 2rem);
+            }
+
+            .cta-button:hover {
+                transform: translateY(-2px) scale(1.02);
+            }
+
+            .portfolio-item:hover {
+                transform: translateY(-5px) scale(1.01);
+            }
+
+            .skill:hover {
+                transform: translateY(-3px) scale(1.01);
+            }
+
+            .social-links a:hover {
+                transform: translateY(-3px) rotate(180deg) scale(1.05);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .portfolio-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .skills {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .floating-shapes {
+                display: none;
+            }
+        }
+
+        /* High resolution displays */
+        @media (min-width: 1400px) {
+            .hero {
+                padding: 2rem 4rem;
+            }
+
+            .portfolio,
+            .about,
+            .contact {
+                padding-left: 6rem;
+                padding-right: 6rem;
+            }
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Focus styles for accessibility */
+        *:focus {
+            outline: 2px solid var(--primary-cyan);
+            outline-offset: 2px;
+        }
+
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cursor"></div>
+    
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <div class="loading-text">Yükleniyor...</div>
+    </div>
+
+    <nav>
+        <div class="nav-container">
+            <div class="logo">3D.Portfolio</div>
+            <div class="menu-toggle" id="menuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#home">Ana Sayfa</a></li>
+                <li><a href="#portfolio">Portfolyo</a></li>
+                <li><a href="#about">Hakkımda</a></li>
+                <li><a href="#contact">İletişim</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="hero" id="home">
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+            <h1>3D Dünyalar Yaratıyorum</h1>
+            <p>Hayal gücünüzü dijital gerçekliğe dönüştüren profesyonel 3D model tasarımcısı</p>
+            <a href="#portfolio" class="cta-button">Çalışmalarımı İncele</a>
+        </div>
+    </section>
+
+    <section class="portfolio" id="portfolio">
+        <h2 class="section-title">Portfolyo</h2>
+        <div class="portfolio-grid">
+            <div class="portfolio-item">
+                <div class="portfolio-image">
+                    <div class="portfolio-icon">🏗️</div>
+                </div>
+                <div class="portfolio-content">
+                    <h3>Mimari Görselleştirme</h3>
+                    <p>Modern mimari yapıların fotorealistik 3D görselleştirmeleri. İç mekan ve dış cephe tasarımları ile müşterilerinize projelerinizi en iyi şekilde sunun.</p>
+                    <div class="portfolio-tech">
+                        <span class="tech-tag">3ds Max</span>
+                        <span class="tech-tag">V-Ray</span>
+                        <span class="tech-tag">AutoCAD</span>
+                        <span class="tech-tag">Lumion</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="portfolio-item">
+                <div class="portfolio-image">
+                    <div class="portfolio-icon">🎮</div>
+                </div>
+                <div class="portfolio-content">
+                    <h3>Oyun Karakterleri</h3>
+                    <p>Oyun endüstrisi için optimize edilmiş düşük ve yüksek poligon karakter modelleri. Benzersiz karakterler yaratarak oyun deneyimini zenginleştirin.</p>
+                    <div class="portfolio-tech">
+                        <span class="tech-tag">Blender</span>
+                        <span class="tech-tag">ZBrush</span>
+                        <span class="tech-tag">Substance Painter</span>
+                        <span class="tech-tag">Maya</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="portfolio-item">
+                <div class="portfolio-image">
+                    <div class="portfolio-icon">🚗</div>
+                </div>
+                <div class="portfolio-content">
+                    <h3>Ürün Tasarımı</h3>
+                    <p>Endüstriyel ürünler için detaylı 3D modelleme ve render hizmetleri. Ürünlerinizi pazara sunmadan önce mükemmel görselleştirin.</p>
+                    <div class="portfolio-tech">
+                        <span class="tech-tag">SolidWorks</span>
+                        <span class="tech-tag">KeyShot</span>
+                        <span class="tech-tag">Fusion 360</span>
+                        <span class="tech-tag">Rhino</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="portfolio-item">
+                <div class="portfolio-image">
+                    <div class="portfolio-icon">🎬</div>
+                </div>
+                <div class="portfolio-content">
+                    <h3>VFX & Animasyon</h3>
+                    <p>Film ve reklam sektörü için profesyonel görsel efektler ve 3D animasyon projeleri. Hikayelerinizi büyüleyici görsellerle anlatın.</p>
+                    <div class="portfolio-tech">
+                        <span class="tech-tag">Cinema 4D</span>
+                        <span class="tech-tag">After Effects</span>
+                        <span class="tech-tag">Houdini</span>
+                        <span class="tech-tag">Nuke</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="portfolio-item">
+                <div class="portfolio-image">
+                    <div class="portfolio-icon">🎨</div>
+                </div>
+                <div class="portfolio-content">
+                    <h3>Sanat & Heykel</h3>
+                    <p>Dijital heykel ve sanat eserleri. Yaratıcılığın dijital dünyada sınırsız ifadesi ile özgün sanat projeleri geliştirin.</p>
+                    <div class="portfolio-tech">
+                        <span class="tech-tag">ZBrush</span>
+                        <span class="tech-tag">Mudbox</span>
+                        <span class="tech-tag">Blender</span>
+                        <span class="tech-tag">Marvelous Designer</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="portfolio-item">
+                <div class="portfolio-image">
+                    <div class="portfolio-icon">🌐</div>
+                </div>
+                <div class="portfolio-content">
+                    <h3>AR/VR Deneyimleri</h3>
+                    <p>Artırılmış ve sanal gerçeklik uygulamaları için optimizere edilmiş 3D modeller. Geleceğin teknolojilerinde yerinizi alın.</p>
+                    <div class="portfolio-tech">
+                        <span class="tech-tag">Unity</span>
+                        <span class="tech-tag">Unreal Engine</span>
+                        <span class="tech-tag">Oculus SDK</span>
+                        <span class="tech-tag">WebXR</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="about" id="about">
+        <div class="about-container">
+            <div class="about-text">
+                <h2>Benim Hikayem</h2>
+                <p>10+ yıllık deneyimle 3D modelleme ve görselleştirme alanında uzmanlaşmış bir tasarımcıyım. Mimari projelerden oyun karakterlerine, ürün tasarımından VFX projelerine kadar geniş bir yelpazede çalışmalar gerçekleştiriyorum.</p>
+                <p>Her projede mükemmellik ve yaratıcılığı harmanlayarak, müşteri beklentilerini aşan sonuçlar üretmeye odaklanıyorum. Teknolojinin sürekli gelişen doğasına ayak uydurarak, en son araçları ve teknikleri kullanarak projelerinize hayat veriyorum.</p>
+                <p>Sizinle çalışarak hayallerinizdeki projeleri gerçeğe dönüştürmek için sabırsızlanıyorum. Her detayda mükemmelliği hedefleyerek, markanızı dijital dünyada öne çıkaracak çözümler sunuyorum.</p>
+                
+                <div class="skills">
+                    <div class="skill">
+                        <h4>3D Modelleme</h4>
+                        <p>Blender, Maya, 3ds Max, ZBrush ile profesyonel modelleme</p>
+                    </div>
+                    <div class="skill">
+                        <h4>Rendering & Lighting</h4>
+                        <p>V-Ray, Corona, Cycles, KeyShot ile fotorealistik görselleştirme</p>
+                    </div>
+                    <div class="skill">
+                        <h4>Texture & Shading</h4>
+                        <p>Substance Suite, Mari, Photoshop ile detaylı doku çalışması</p>
+                    </div>
+                    <div class="skill">
+                        <h4>Animation & VFX</h4>
+                        <p>Cinema 4D, After Effects, Houdini ile dinamik animasyonlar</p>
+                    </div>
+                    <div class="skill">
+                        <h4>Game Development</h4>
+                        <p>Unity, Unreal Engine ile oyun ready modeller</p>
+                    </div>
+                    <div class="skill">
+                        <h4>AR/VR Development</h4>
+                        <p>Oculus SDK, WebXR ile immersive deneyimler</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="about-visual">
+                <div class="floating-shapes">
+                    <div class="shape"></div>
+                    <div class="shape"></div>
+                    <div class="shape"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="contact" id="contact">
+        <h2 class="section-title">İletişime Geçin</h2>
+        <p>Projeniz için benimle çalışmak ister misiniz? Hayallerinizdeki 3D projeyi birlikte gerçeğe dönüştürelim. Her türlü soru ve teklif için 7/24 iletişim halindeyim.</p>
+        
+        <form class="contact-form" id="contactForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <input type="text" placeholder="Adınız *" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" placeholder="E-posta Adresiniz *" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <input type="text" placeholder="Telefon Numaranız">
+                </div>
+                <div class="form-group">
+                    <input type="text" placeholder="Şirket/Organizasyon">
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="text" placeholder="Proje Konusu *" required>
+            </div>
+            <div class="form-group">
+                <textarea placeholder="Proje Detayları - Ne tür bir 3D proje düşünüyorsunuz? Hedef kitleniz, timeline ve bütçe hakkında bilgi verebilir misiniz? *" rows="6" required></textarea>
+            </div>
+            <button type="submit" class="submit-btn" id="submitBtn">Proje Teklifimi Gönder</button>
+        </form>
+    </section>
+
+    <footer>
+        <div class="social-links">
+            <a href="mailto:contact@3dportfolio.com" title="E-posta">📧</a>
+            <a href="#" title="LinkedIn">💼</a>
+            <a href="#" title="Instagram">📷</a>
+            <a href="#" title="Behance">🎨</a>
+            <a href="#" title="ArtStation">🖼️</a>
+        </div>
+        <p>&copy; 2025 3D Portfolio. Tüm hakları saklıdır. | Profesyonel 3D Tasarım Hizmetleri</p>
+    </footer>
+
+    <script>
+        // Enhanced Loading Animation
+        window.addEventListener('load', () => {
+            const loading = document.getElementById('loading');
+            setTimeout(() => {
+                loading.classList.add('hidden');
+                // Start entrance animations after loading
+                startEntranceAnimations();
+            }, 2000);
+        });
+
+        function startEntranceAnimations() {
+            // Animate navigation
+            const nav = document.querySelector('nav');
+            nav.style.animation = 'slideDown 1s ease-out';
+            
+            // Animate hero content with stagger
+            const heroElements = document.querySelectorAll('.hero-content > *');
+            heroElements.forEach((el, index) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                setTimeout(() => {
+                    el.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, index * 200 + 500);
+            });
+        }
+
+        // Enhanced Custom Cursor (Desktop Only)
+        if (window.innerWidth >= 1024) {
+            const cursor = document.querySelector('.cursor');
+            let mouseX = 0, mouseY = 0;
+            let cursorX = 0, cursorY = 0;
+
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+
+            function animateCursor() {
+                cursorX += (mouseX - cursorX) * 0.1;
+                cursorY += (mouseY - cursorY) * 0.1;
+                
+                cursor.style.left = cursorX + 'px';
+                cursor.style.top = cursorY + 'px';
+                requestAnimationFrame(animateCursor);
+            }
+            animateCursor();
+
+            // Cursor grow effect
+            const interactiveElements = document.querySelectorAll('a, button, .portfolio-item, input, textarea');
+            interactiveElements.forEach(el => {
+                el.addEventListener('mouseenter', () => cursor.classList.add('grow'));
+                el.addEventListener('mouseleave', () => cursor.classList.remove('grow'));
+            });
+        }
+
+        // Enhanced Mobile Menu
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+
+        menuToggle.addEventListener('click', () => {
+            menuToggle.classList.toggle('active');
+            navLinks.classList.toggle('active');
+            
+            // Prevent body scroll when menu is open
+            document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : '';
+        });
+
+        // Close mobile menu when clicking on a link
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                menuToggle.classList.remove('active');
+                navLinks.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!menuToggle.contains(e.target) && !navLinks.contains(e.target)) {
+                menuToggle.classList.remove('active');
+                navLinks.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+
+        // Enhanced Smooth Scrolling with offset for fixed nav
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const navHeight = document.querySelector('nav').offsetHeight;
+                    const targetPosition = target.offsetTop - navHeight - 20;
+                    
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Enhanced Portfolio Item Interactions
+        const portfolioItems = document.querySelectorAll('.portfolio-item');
+        portfolioItems.forEach((item, index) => {
+            // Entrance animation on scroll
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => {
+                            entry.target.style.opacity = '1';
+                            entry.target.style.transform = 'translateY(0)';
+                        }, index * 100);
+                    }
+                });
+            }, { threshold: 0.2 });
+            
+            item.style.opacity = '0';
+            item.style.transform = 'translateY(50px)';
+            item.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+            observer.observe(item);
+
+            // Enhanced hover effects
+            item.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px) scale(1.02)';
+                this.style.zIndex = '10';
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+                this.style.zIndex = '1';
+            });
+
+            // Click animation with ripple effect
+            item.addEventListener('click', function(e) {
+                const ripple = document.createElement('div');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.cssText = `
+                    position: absolute;
+                    border-radius: 50%;
+                    background: rgba(0, 255, 255, 0.3);
+                    width: ${size}px;
+                    height: ${size}px;
+                    left: ${x}px;
+                    top: ${y}px;
+                    transform: scale(0);
+                    animation: ripple 0.6s linear;
+                    pointer-events: none;
+                `;
+                
+                this.style.position = 'relative';
+                this.appendChild(ripple);
+                
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+
+        // Enhanced Form Handling
+        const contactForm = document.getElementById('contactForm');
+        const submitBtn = document.getElementById('submitBtn');
+
+        contactForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const originalText = submitBtn.textContent;
+            const formData = new FormData(this);
+            
+            // Animate button
+            submitBtn.textContent = 'Gönderiliyor...';
+            submitBtn.style.background = 'linear-gradient(45deg, #ffa500, #ff6b35)';
+            submitBtn.disabled = true;
+            
+            // Simulate form submission
+            try {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                submitBtn.textContent = 'Gönderildi ✓';
+                submitBtn.style.background = 'linear-gradient(45deg, #00ff00, #008000)';
+                
+                // Success animation
+                submitBtn.style.transform = 'scale(1.05)';
+                setTimeout(() => {
+                    submitBtn.style.transform = 'scale(1)';
+                }, 200);
+                
+                setTimeout(() => {
+                    submitBtn.textContent = originalText;
+                    submitBtn.style.background = 'linear-gradient(45deg, var(--primary-cyan), var(--primary-magenta))';
+                    submitBtn.disabled = false;
+                    this.reset();
+                    
+                    // Show success message
+                    showNotification('Mesajınız başarıyla gönderildi! En kısa sürede size dönüş yapacağım.', 'success');
+                }, 3000);
+                
+            } catch (error) {
+                submitBtn.textContent = 'Tekrar Deneyin';
+                submitBtn.style.background = 'linear-gradient(45deg, #ff4444, #cc0000)';
+                submitBtn.disabled = false;
+                
+                showNotification('Bir hata oluştu. Lütfen tekrar deneyin.', 'error');
+            }
+        });
+
+        // Notification System
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                padding: 1rem 1.5rem;
+                background: ${type === 'success' ? 'rgba(0, 255, 0, 0.9)' : 'rgba(255, 68, 68, 0.9)'};
+                color: white;
+                border-radius: 10px;
+                z-index: 10001;
+                transform: translateX(400px);
+                transition: transform 0.3s ease;
+                max-width: 300px;
+                backdrop-filter: blur(10px);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => notification.style.transform = 'translateX(0)', 100);
+            setTimeout(() => {
+                notification.style.transform = 'translateX(400px)';
+                setTimeout(() => notification.remove(), 300);
+            }, 4000);
+        }
+
+        // Enhanced Parallax Effect
+        let ticking = false;
+        function updateParallax() {
+            const scrolled = window.pageYOffset;
+            const heroBackground = document.querySelector('.hero-bg');
+            const shapes = document.querySelectorAll('.shape');
+            
+            if (heroBackground) {
+                heroBackground.style.transform = `translateY(${scrolled * 0.5}px)`;
+            }
+            
+            shapes.forEach((shape, index) => {
+                const speed = 0.1 + index * 0.05;
+                shape.style.transform += ` translateY(${scrolled * speed}px)`;
+            });
+            
+            ticking = false;
+        }
+
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                requestAnimationFrame(updateParallax);
+                ticking = true;
+            }
+        });
+
+        // Enhanced Navbar Background on Scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            const scrollPercent = Math.min(window.scrollY / 200, 1);
+            
+            nav.style.background = `rgba(0, 0, 0, ${0.3 + scrollPercent * 0.6})`;
+            nav.style.backdropFilter = `blur(${10 + scrollPercent * 10}px)`;
+        });
+
+        // Enhanced Dynamic Particles
+        const particles = [];
+        const maxParticles = window.innerWidth < 768 ? 20 : 50;
+
+        function createParticle() {
+            if (particles.length >= maxParticles) return;
+            
+            const particle = document.createElement('div');
+            const size = Math.random() * 3 + 1;
+            const color = Math.random() > 0.5 ? 'var(--primary-cyan)' : 'var(--primary-magenta)';
+            
+            particle.style.cssText = `
+                position: fixed;
+                width: ${size}px;
+                height: ${size}px;
+                background: ${color};
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: 1;
+                opacity: ${Math.random() * 0.5 + 0.3};
+                left: ${Math.random() * window.innerWidth}px;
+                top: ${window.innerHeight + 10}px;
+            `;
+            
+            document.body.appendChild(particle);
+            particles.push(particle);
+            
+            const duration = Math.random() * 4000 + 3000;
+            const drift = (Math.random() - 0.5) * 200;
+            const rotation = Math.random() * 360;
+            
+            particle.animate([
+                { 
+                    transform: 'translateY(0px) translateX(0px) rotate(0deg)', 
+                    opacity: particle.style.opacity 
+                },
+                { 
+                    transform: `translateY(-${window.innerHeight + 100}px) translateX(${drift}px) rotate(${rotation}deg)`, 
+                    opacity: 0 
+                }
+            ], {
+                duration: duration,
+                easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+            }).onfinish = () => {
+                particle.remove();
+                const index = particles.indexOf(particle);
+                if (index > -1) particles.splice(index, 1);
+            };
+        }
+
+        // Create particles at intervals
+        setInterval(createParticle, 300);
+
+        // Skills Animation on Scroll
+        const skillElements = document.querySelectorAll('.skill');
+        const skillObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0) scale(1)';
+                    }, index * 150);
+                }
+            });
+        }, { threshold: 0.3 });
+
+        skillElements.forEach(skill => {
+            skill.style.opacity = '0';
+            skill.style.transform = 'translateY(30px) scale(0.9)';
+            skill.style.transition = 'all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+            skillObserver.observe(skill);
+        });
+
+        // Enhanced Shape Interactions
+        const shapes = document.querySelectorAll('.shape');
+        shapes.forEach((shape, index) => {
+            shape.addEventListener('mouseenter', () => {
+                shape.style.animationPlayState = 'paused';
+                shape.style.transform = 'scale(1.3)';
+                shape.style.filter = 'brightness(1.5) saturate(1.2)';
+            });
+            
+            shape.addEventListener('mouseleave', () => {
+                shape.style.animationPlayState = 'running';
+                shape.style.transform = 'scale(1)';
+                shape.style.filter = 'brightness(1) saturate(1)';
+            });
+        });
+
+        // Keyboard Navigation Support
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                menuToggle.classList.remove('active');
+                navLinks.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+
+        // Performance Optimization - Reduce animations on low-end devices
+        if (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4) {
+            document.documentElement.style.setProperty('--transition-smooth', 'all 0.2s ease');
+            document.documentElement.style.setProperty('--transition-bounce', 'all 0.3s ease');
+        }
+
+        // Console Welcome Message
+        console.log(`
+        🎨 3D Portfolio Website
+        ========================
+        ✨ Responsive Design: ✅
+        🚀 Modern Animations: ✅  
+        📱 Mobile Optimized: ✅
+        ♿ Accessibility: ✅
+        🎭 Interactive Effects: ✅
+        
+        Designed with ❤️ for professional 3D artists
+        `);
+
+        // Add ripple animation keyframes
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
